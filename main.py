@@ -117,6 +117,11 @@ def randomly_generate_weights():
         for y in range(matrix.length):
             matrix.get_tile(x,y).set_weight(random.randint(0,501))
 
+def get_real_weights():
+    """Method for getting the real weights"""
+    for x in range(matrix.length):
+        for y in range(matrix.length):
+            matrix.get_tile(x,y).get_weight()
 
 
 screen.fill(WHITE)
@@ -146,6 +151,10 @@ while not done:
     visualiseGrid()
     # UNCOMMENT WHEN TESTING WITH RANDOM VALUES
     # randomly_generate_weights()
+
+    # UNCOMMENT WHEN READING THE REEEEEEEEEEEAL WEIGHTS
+    # get_real_weights()
+
     current_time = pygame.time.get_ticks()
     someone_did_step = read_weights()
 

@@ -41,7 +41,10 @@ class Tile:
     
     def set_weight(self, weight):
         self.weight = weight
-        # self.weight = HX711_GetWeight(self.controller_address, self.port_index)
+
+    def get_weight(self):
+       # self.weight = HX711_GetWeight(self.controller_address, self.port_index)
+       pass
 
     def enable(self, color):
         self.enabled = True
