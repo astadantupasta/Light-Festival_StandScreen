@@ -18,14 +18,13 @@ class Tile:
     weight: (float)
     """
 
-    def __init__(self, controller_address, port_index):
+    def __init__(self, controller_address, port_index, sound):
         self.controller_address = controller_address
         self.color = BLACK
         self.port_index = port_index
+        self.sound = sound
         self.enabled = False
         self.weight = 0.0
-    
-
     
     def is_pressed(self):
         return self.weight > 0
@@ -38,9 +37,11 @@ class Tile:
     
     def set_color(self, color):
         self.color = color
+        #  RGBW_SetColor(self.controller_address, self.port_index, self.color)
     
     def set_weight(self, weight):
         self.weight = weight
+        # self.weight = HX711_GetWeight(self.controller_address, self.port_index)
 
     def enable(self, color):
         self.enabled = True

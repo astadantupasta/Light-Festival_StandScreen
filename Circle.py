@@ -5,6 +5,7 @@ from Matrix import Matrix
 import random
 import colorsys
 import time
+import pygame
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -16,14 +17,20 @@ GREY = (128, 128, 128)
 class Circle(IGame):
     """Colors the surrounding tiles of the one on which someone stepped
     in a random bright color"""
+    def get_music(self):
+        return 'static\\music\\NewGameStarted.wav'
+
     def start_game(self, matrix):
         matrix.enable_all_tiles(BLACK)
+        pygame.mixer.music.load(self.get_music())
+        pygame.mixer.music.play(1)
 
     def end_game(self, matrix):
         matrix.disable_all_tiles(BLACK)
+        pygame.mixer.music.stop()
 
     def react_to_click(self, matrix, x, y):
-       # matrix.get_tile(x, y).set_color(RED)
+        pygame.mixer.Sound.play(matrix.get_tile(x, y).sound)
 
         color = self.get_random_bright_color()
 

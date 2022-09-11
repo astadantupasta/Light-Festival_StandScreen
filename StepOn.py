@@ -5,6 +5,7 @@ from Matrix import Matrix
 import random
 import colorsys
 import time
+import pygame
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -19,8 +20,14 @@ SECOND = (204, 0, 204)
 
 class StepOn(IGame):
     """Writes on the matrix STEP ON"""
+
+    def get_music(self):
+        return 'static\\music\\StepOn.wav'
+
     def start_game(self, matrix):
         matrix.enable_all_tiles(BLACK)
+        pygame.mixer.music.load(self.get_music())
+        pygame.mixer.music.play(-1)
 
         # Writing STEP ON
 
@@ -100,6 +107,7 @@ class StepOn(IGame):
 
     def end_game(self, matrix):
         matrix.disable_all_tiles(BLACK)
+        pygame.mixer.music.stop()
 
     def react_to_click(self, matrix, x, y):
        matrix.disable_all_tiles(BLACK)

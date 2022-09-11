@@ -5,6 +5,10 @@ import pygame, sys
 
 class IGame(ABC):
     @abstractmethod
+    def get_music(self):
+        pass
+
+    @abstractmethod
     def start_game(self, matrix):
         pass
 
