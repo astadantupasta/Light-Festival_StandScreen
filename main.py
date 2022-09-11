@@ -9,7 +9,6 @@ from Tile import Tile
 from Matrix import Matrix
 from Circle import Circle
 import random
-from playsound import playsound
  
 # Define some colors
 BLACK = (0, 0, 0)
