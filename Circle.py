@@ -39,8 +39,33 @@ class Circle(IGame):
             if i >= 0 and i < matrix.length:
                 for j in range(y-1, y+2):
                     if j >= 0 and j < matrix.length:
-                        matrix.get_tile(i, j).set_color(color)
+                        if matrix.get_tile(i, j).weight < 500 or (x == i and y ==j):
+                            matrix.get_tile(i, j).set_color(color)
 
+    def react_to_standing(self, matrix, x, y):
+        r,g,b = matrix.get_tile(x, y).color
+
+        r -= 5
+        g -= 5
+        b -= 5
+
+        if r < 0:
+            r = 0
+
+        if g < 0:
+            g = 0
+
+        if b < 0:
+            b = 0
+        
+        color2 = (r, g, b)
+
+        for i in range(x-1, x+2):
+            if i >= 0 and i < matrix.length:
+                for j in range(y-1, y+2):
+                    if j >= 0 and j < matrix.length:
+                        if (matrix.get_tile(i, j).weight < 500) or (x == i and y == j):
+                            matrix.get_tile(i, j).set_color(color2)
 
     def react_to_unclick(self, matrix, x, y):
         # Turns off the light
@@ -49,6 +74,7 @@ class Circle(IGame):
                 for j in range(y-1, y+2):
                     if j >= 0 and j < matrix.length:
                         matrix.get_tile(i, j).set_color(BLACK)
+
 
     
 

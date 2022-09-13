@@ -115,5 +115,8 @@ class StepOn(IGame):
     def react_to_unclick(self, matrix, x, y):
         pass
 
+    def react_to_standing(self, matrix, x, y):
+        pass
+
     
 

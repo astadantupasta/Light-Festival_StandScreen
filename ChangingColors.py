@@ -54,5 +54,8 @@ class ChangingColors(IGame):
 
     def react_to_unclick(self, matrix, x, y):
         matrix.disable_all_tiles(BLACK)
+
+    def react_to_standing(self, matrix, x, y):
+        pass
     
 

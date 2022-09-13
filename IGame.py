@@ -17,11 +17,15 @@ class IGame(ABC):
         pass
 
     @abstractmethod
-    def react_to_click(self, x, y, matrix):
+    def react_to_click(self, matrix, x, y):
         pass
 
     @abstractmethod
-    def react_to_unclick(self, x, y, matrix):
+    def react_to_standing(self, matrix, x, y):
+        pass
+
+    @abstractmethod
+    def react_to_unclick(self, matrix, x, y):
         pass
 
     def get_random_bright_color(self):
@@ -30,11 +34,3 @@ class IGame(ABC):
         r, g, b = [int(256*i) for i in colorsys.hls_to_rgb(h, l, s)]
         color = (r, g, b)
         return color
-
-    def wait(self, time):
-        """Dealys code for a specified amount of seconds"""
-        current_time = pygame.time.get_ticks()
-        end_time = current_time + time * 1000
-
-        while current_time < end_time:
-            current_time = pygame.time.get_ticks()

@@ -19,11 +19,9 @@ GREY = (128, 128, 128)
 
 length = 13
 
-a2 = 'static\\piano\\a2.wav'
-
 # Matrix for previous and current matrix state
-previous_state = [[0 for x in range(length)] for y in range(length)]
-current_state = [[0 for x in range(length)] for y in range(length)]
+previous_matrix_state = [[0 for x in range(length)] for y in range(length)]
+current_matrix_state = [[0 for x in range(length)] for y in range(length)]
  
 pygame.init()
 
@@ -87,7 +85,7 @@ def visualiseGrid():
 def read_weights():
     """Reads the weights, reacts if someone steps on the tile.
     Return: (bool) True if at least one person stepped on the tile"""
-    global previous_state, current_state
+    global previous_matrix_state, current_matrix_state
     stepped = False
 
     for x in range(length):
@@ -95,18 +93,23 @@ def read_weights():
         for y in range(length):
 
             if matrix.get_tile(x, y).weight > 500: # CHECK CONDITION, IS IT 500?
-                current_state[x][y] = 1
-            if current_state[x][y] == 1 and previous_state[x][y] == 0:
+                current_matrix_state[x][y] = 1
+            if current_matrix_state[x][y] == 1 and previous_matrix_state[x][y] == 0:
                 game.react_to_click(matrix, x, y)
                 stepped = True
             else:
-                 if current_state[x][y] == 0 and previous_state[x][y] == 1:
+                if current_matrix_state[x][y] == 0 and previous_matrix_state[x][y] == 1:
                     game.react_to_unclick(matrix, x, y)
+                else:
+                    if current_matrix_state[x][y] == 1 and previous_matrix_state[x][y] == 1 and (type(game) is Circle):
+                        if matrix.get_tile(x,y).color != (0,0,0):
+                            game.react_to_standing(matrix, x, y)
+                            clock.tick(200)
     
     # If the game is not the one, which turns on only when installation's participants are absent
     if (type(game) is not StepOn) and (type(game) is not ChangingColors) :
-        previous_state = current_state
-    current_state = [[0 for x in range(length)] for y in range(length)]
+        previous_matrix_state = current_matrix_state
+    current_matrix_state = [[0 for x in range(length)] for y in range(length)]
 
     return stepped
 
@@ -134,7 +137,7 @@ someone_did_step = False
 
 # Saves times
 current_time = pygame.time.get_ticks()
-last_time_someone_stepped = pygame.time.get_ticks()
+last_tile_trigger_timestamp = pygame.time.get_ticks()
 step_on_started = 0
 
 # Booleans for types
@@ -158,7 +161,7 @@ while not done:
     someone_did_step = read_weights()
 
     if someone_did_step:
-        last_time_someone_stepped = pygame.time.get_ticks()
+        last_tile_trigger_timestamp = pygame.time.get_ticks()
 
         # Animation in on? Start the game
         if (step_on_is_on or changing_colors_is_on):
@@ -173,10 +176,10 @@ while not done:
     
     else:
         # No interaction with the installation for 10 seconds? Turn on StepOn
-        if (current_time - last_time_someone_stepped) > 30000:
+        if (current_time - last_tile_trigger_timestamp) > 30000:
             game.end_game(matrix)
             changing_colors_is_on = False
-            last_time_someone_stepped = pygame.time.get_ticks()
+            last_tile_trigger_timestamp = pygame.time.get_ticks()
             step_on_started = pygame.time.get_ticks()
             game = StepOn()
             game.start_game(matrix)
