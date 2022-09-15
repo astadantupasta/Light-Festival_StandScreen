@@ -140,6 +140,11 @@ current_time = pygame.time.get_ticks()
 last_tile_trigger_timestamp = pygame.time.get_ticks()
 step_on_started = 0
 
+# Variables for ChangingColors
+last_rand_tile_color_in_red_timestamp = pygame.time.get_ticks()
+rand_x = random.randint(0,12)
+rand_y = random.randint(0,12)
+
 # Booleans for types
 step_on_is_on = False
 circle_is_on = True
@@ -185,8 +190,8 @@ while not done:
             game.start_game(matrix)
             step_on_is_on = True
 
-        # StepOn taking longer than 4 sec? Start the ChangingColors
-        if (step_on_is_on and (current_time - step_on_started) > 4000):
+        # StepOn taking longer than 5 sec? Start the ChangingColors
+        if (step_on_is_on and (current_time - step_on_started) > 5000):
             game.end_game(matrix)
             step_on_started = 0
             step_on_is_on = False
@@ -198,6 +203,12 @@ while not done:
         if changing_colors_is_on:
             clock.tick(60)
             game.react_to_click(matrix,0,0)
+            matrix.get_tile(rand_x, rand_y).set_color(RED)
+            if (current_time - last_rand_tile_color_in_red_timestamp) > 460:
+                rand_x = random.randint(0,12)
+                rand_y = random.randint(0,12)
+                last_rand_tile_color_in_red_timestamp = pygame.time.get_ticks()
+
 
 
 # Close everything down
