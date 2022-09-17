@@ -145,7 +145,7 @@ last_rand_tile_color_in_red_timestamp = pygame.time.get_ticks()
 rand_x = random.randint(0,12)
 rand_y = random.randint(0,12)
 
-# Booleans for types
+# Booleans for different games/animations
 print_text_is_on = False
 circle_is_on = False
 changing_colors_is_on = False
@@ -168,6 +168,7 @@ while not done:
 
     # First 50 sek. Or games going for 10 mins? Start Intro animation
     if ((current_time - beginning_timestamp) < 58000 or (current_time - intro_started_timestamp) > 658000) and not intro_is_on:
+        # Print numbers 3 to 1
         game = PrintText()
         game.start_game(matrix)
 
@@ -187,7 +188,7 @@ while not done:
         visualiseGrid()
         pygame.time.delay(1000)
 
-
+        # Start animation
         game.end_game(matrix)
         game = Intro()
         game.start_game(matrix)
@@ -206,7 +207,7 @@ while not done:
             else:
                 clock.tick(60)
         
-        # Animation time elapsed? Show Animation
+        # Animation time elapsed? Print numbers from 3 to 1
         if (current_time - intro_started_timestamp) > 50000:
             intro_is_on = False
             game.end_game(matrix)
