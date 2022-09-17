@@ -1,5 +1,6 @@
 from Tile import Tile
 import pygame
+import random
 
 class Matrix:
 
@@ -74,6 +75,58 @@ class Matrix:
         for x in range(self.length):
             for y in range(self.length):
                 self.tiles[x][y].disable(color)
+
+    def color_all(self, color):
+        for x in range(self.length):
+            for y in range(self.length):
+                self.tiles[x][y].set_color(color)
+
+    def color_given_tiles(self, multi_array, color):
+        for array in multi_array:
+            self.tiles[array[0]][array[1]].set_color(color)
+
+    def color_row(self, row_num, color):
+        for i in range(self.length):
+            self.tiles[row_num][i].set_color(color)
+
+    def color_column(self, column_num, color):
+        for i in range(self.length):
+            self.tiles[i][column_num].set_color(color)
+
+    def color_random_tile(self, num_of_tiles_to_color, color):
+        for i in range(num_of_tiles_to_color):
+            self.tiles[random.randint(0, 12)][random.randint(0, 12)].set_color(color)
+
+    def fade_in(self, final_color, multi_array):
+
+        (r,g,b) = self.tiles[multi_array[0][0]][multi_array[0][1]].color
+        (r_final, g_final, b_final) = final_color
+
+        r += r_final / 30
+        g += g_final / 30
+        b += b_final / 30
+
+        if r > r_final: r = r_final
+        if g > g_final: g = g_final
+        if b > b_final: b = b_final
+
+        for array in multi_array:
+            self.tiles[array[0]][array[1]].set_color((r,g,b))
+
+    def fade_in_all(self, final_color):
+
+        (r,g,b) = self.tiles[0][0].color
+        (r_final, g_final, b_final) = final_color
+
+        r += r_final / 30
+        g += g_final / 30
+        b += b_final / 30
+
+        if r > r_final: r = r_final
+        if g > g_final: g = g_final
+        if b > b_final: b = b_final
+
+        self.color_all((r,g,b))
 
 
 

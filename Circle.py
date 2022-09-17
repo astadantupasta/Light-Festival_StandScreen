@@ -49,14 +49,9 @@ class Circle(IGame):
         g -= 5
         b -= 5
 
-        if r < 0:
-            r = 0
-
-        if g < 0:
-            g = 0
-
-        if b < 0:
-            b = 0
+        if r < 0: r = 0
+        if g < 0: g = 0
+        if b < 0: b = 0
         
         color2 = (r, g, b)
 

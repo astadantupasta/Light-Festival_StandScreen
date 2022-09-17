@@ -4,10 +4,11 @@ from pygame.locals import *
 import math
 from ChangingColors import ChangingColors
 from IGame import IGame
-from StepOn import StepOn
+from PrintText import PrintText
 from Tile import Tile
 from Matrix import Matrix
 from Circle import Circle
+from Intro_ShowYourStripes import Intro
 import random
  
 # Define some colors
@@ -27,9 +28,6 @@ pygame.init()
 
 # Matrix initiation
 matrix = Matrix()
-
-# IGame initiation
-game = Circle()
 
 # Set screen parameters
 size = [660, 660]
@@ -107,7 +105,7 @@ def read_weights():
                             clock.tick(200)
     
     # If the game is not the one, which turns on only when installation's participants are absent
-    if (type(game) is not StepOn) and (type(game) is not ChangingColors) :
+    if (type(game) is not PrintText) and (type(game) is not ChangingColors) :
         previous_matrix_state = current_matrix_state
     current_matrix_state = [[0 for x in range(length)] for y in range(length)]
 
@@ -130,15 +128,17 @@ screen.fill(WHITE)
 pygame.display.set_caption("StandScreen")
 
 # Game initiation
-game = Circle()
+game = Intro()
 
 # Variable for testing weather someone stepped on the tile
 someone_did_step = False
 
-# Saves times
+# Save timestamps
 current_time = pygame.time.get_ticks()
 last_tile_trigger_timestamp = pygame.time.get_ticks()
-step_on_started = 0
+beginning_timestamp = pygame.time.get_ticks()
+intro_started_timestamp = 0
+print_text_started_timestamp = 0
 
 # Variables for ChangingColors
 last_rand_tile_color_in_red_timestamp = pygame.time.get_ticks()
@@ -146,9 +146,10 @@ rand_x = random.randint(0,12)
 rand_y = random.randint(0,12)
 
 # Booleans for types
-step_on_is_on = False
-circle_is_on = True
+print_text_is_on = False
+circle_is_on = False
 changing_colors_is_on = False
+intro_is_on = False
 
 clock = pygame.time.Clock()
 
@@ -165,49 +166,122 @@ while not done:
     current_time = pygame.time.get_ticks()
     someone_did_step = read_weights()
 
+    # First 50 sek. Or games going for 10 mins? Start Intro animation
+    if ((current_time - beginning_timestamp) < 58000 or (current_time - intro_started_timestamp) > 658000) and not intro_is_on:
+        game = PrintText()
+        game.start_game(matrix)
+
+        game.paint_letters(matrix, 2)
+        visualiseGrid()
+        pygame.time.delay(5000)
+
+        game.paint_letters(matrix, 6)
+        visualiseGrid()
+        pygame.time.delay(1000)
+
+        game.paint_letters(matrix, 5)
+        visualiseGrid()
+        pygame.time.delay(1000)
+
+        game.paint_letters(matrix, 4)
+        visualiseGrid()
+        pygame.time.delay(1000)
+
+
+        game.end_game(matrix)
+        game = Intro()
+        game.start_game(matrix)
+        intro_started_timestamp = pygame.time.get_ticks()
+        intro_is_on = True
+
+    # Is Intro animation going?
+    if intro_is_on:
+        game.react_to_click(matrix, 0, 0)
+
+        if (current_time - intro_started_timestamp) < 16000:
+            clock.tick(2)
+        else:
+            if (current_time - intro_started_timestamp) < 25000:
+                clock.tick(4)
+            else:
+                clock.tick(60)
+        
+        # Animation time elapsed? Show Animation
+        if (current_time - intro_started_timestamp) > 50000:
+            intro_is_on = False
+            game.end_game(matrix)
+
+            game = PrintText()
+            game.start_game(matrix)
+
+            game.paint_letters(matrix, 6)
+            visualiseGrid()
+            pygame.time.delay(1000)
+
+            game.paint_letters(matrix, 5)
+            visualiseGrid()
+            pygame.time.delay(1000)
+
+            game.paint_letters(matrix, 4)
+            visualiseGrid()
+            pygame.time.delay(1000)
+
+            game.paint_letters(matrix, 1)
+
+            last_tile_trigger_timestamp = pygame.time.get_ticks()
+            print_text_started_timestamp = pygame.time.get_ticks()
+            print_text_is_on = True
+        continue
+ 
+
     if someone_did_step:
         last_tile_trigger_timestamp = pygame.time.get_ticks()
 
         # Animation in on? Start the game
-        if (step_on_is_on or changing_colors_is_on):
-            step_on_started = 0
-            step_on_is_on = False
+        if (print_text_is_on or changing_colors_is_on):
+            print_text_started_timestamp = 0
+            print_text_is_on = False
             changing_colors_is_on = False
 
             game = Circle()
             game.start_game(matrix)
 
             someone_did_step = read_weights()
-    
-    else:
-        # No interaction with the installation for 10 seconds? Turn on StepOn
-        if (current_time - last_tile_trigger_timestamp) > 30000:
-            game.end_game(matrix)
-            changing_colors_is_on = False
-            last_tile_trigger_timestamp = pygame.time.get_ticks()
-            step_on_started = pygame.time.get_ticks()
-            game = StepOn()
-            game.start_game(matrix)
-            step_on_is_on = True
+        continue
+            
+    # No interaction with the installation for 10 seconds? Turn on PrintText: STEP ON
+    if (current_time - last_tile_trigger_timestamp) > 30000:
+        game.end_game(matrix)
+        changing_colors_is_on = False
+        last_tile_trigger_timestamp = pygame.time.get_ticks()
+        print_text_started_timestamp = pygame.time.get_ticks()
+        game = PrintText()
+        game.start_game(matrix)
+        game.paint_letters(matrix, 1)
+        print_text_is_on = True
 
-        # StepOn taking longer than 5 sec? Start the ChangingColors
-        if (step_on_is_on and (current_time - step_on_started) > 5000):
-            game.end_game(matrix)
-            step_on_started = 0
-            step_on_is_on = False
-            changing_colors_is_on = True
-            game = ChangingColors()
-            game.start_game(matrix)
+        continue
 
-        # Changing colors is on?
-        if changing_colors_is_on:
-            clock.tick(60)
-            game.react_to_click(matrix,0,0)
-            matrix.get_tile(rand_x, rand_y).set_color(RED)
-            if (current_time - last_rand_tile_color_in_red_timestamp) > 460:
-                rand_x = random.randint(0,12)
-                rand_y = random.randint(0,12)
-                last_rand_tile_color_in_red_timestamp = pygame.time.get_ticks()
+    # PrintText taking longer than 5 sec? Start the ChangingColors
+    if (print_text_is_on and (current_time - print_text_started_timestamp) > 5000):
+        game.end_game(matrix)
+        print_text_started = 0
+        print_text_is_on = False
+        changing_colors_is_on = True
+        game = ChangingColors()
+        game.start_game(matrix)
+
+    # Changing colors is on?
+    if changing_colors_is_on:
+        clock.tick(60)
+        game.react_to_click(matrix,0,0)
+        matrix.get_tile(rand_x, rand_y).set_color(RED)
+        if (current_time - last_rand_tile_color_in_red_timestamp) > 460:
+            rand_x = random.randint(0,12)
+            rand_y = random.randint(0,12)
+            last_rand_tile_color_in_red_timestamp = pygame.time.get_ticks()
+        
+        continue
 
 
 
