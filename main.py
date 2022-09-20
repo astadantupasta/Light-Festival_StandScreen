@@ -10,6 +10,7 @@ from Matrix import Matrix
 from Circle import Circle
 from Intro_ShowYourStripes import Intro
 import random
+from CrazyFrog import CrazyFrog
  
 # Define some colors
 BLACK = (0, 0, 0)
@@ -99,7 +100,7 @@ def read_weights():
                 if current_matrix_state[x][y] == 0 and previous_matrix_state[x][y] == 1:
                     game.react_to_unclick(matrix, x, y)
                 else:
-                    if current_matrix_state[x][y] == 1 and previous_matrix_state[x][y] == 1 and (type(game) is Circle):
+                    if current_matrix_state[x][y] == 1 and previous_matrix_state[x][y] == 1 and ((type(game) is Circle) or type(game) is CrazyFrog):
                         if matrix.get_tile(x,y).color != (0,0,0):
                             game.react_to_standing(matrix, x, y)
                             clock.tick(200)
@@ -139,6 +140,7 @@ last_tile_trigger_timestamp = pygame.time.get_ticks()
 beginning_timestamp = pygame.time.get_ticks()
 intro_started_timestamp = 0
 print_text_started_timestamp = 0
+last_change_of_colors_for_CrazyFrog = pygame.time.get_ticks()
 
 # Variables for ChangingColors
 last_rand_tile_color_in_red_timestamp = pygame.time.get_ticks()
@@ -153,6 +155,10 @@ intro_is_on = False
 
 clock = pygame.time.Clock()
 
+# UNCOMMENT 159 and 160 lines when testing CrazyFrog
+# game = CrazyFrog()
+# game.start_game(matrix)
+
 # Loop until the user clicks the close button.
 done = False
 while not done:
@@ -165,6 +171,17 @@ while not done:
 
     current_time = pygame.time.get_ticks()
     someone_did_step = read_weights()
+
+    # -----
+    # UNCOMMENT 159 and 160 lines when testing only CrazyFrog
+    if (type(game) is CrazyFrog) and (current_time - last_change_of_colors_for_CrazyFrog) > 5000:
+        game.color_tiles_in_red_and_green(matrix)
+        last_change_of_colors_for_CrazyFrog = pygame.time.get_ticks()
+        continue
+    else:
+        if(type(game) is CrazyFrog):
+            continue
+    # ----
 
     # First 50 sek. Or games going for 10 mins? Start Intro animation
     if ((current_time - beginning_timestamp) < 58000 or (current_time - intro_started_timestamp) > 658000) and not intro_is_on:
