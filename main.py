@@ -124,7 +124,6 @@ def get_real_weights():
         for y in range(matrix.length):
             matrix.get_tile(x,y).get_weight()
 
-
 screen.fill(WHITE)
 pygame.display.set_caption("StandScreen")
 
@@ -140,6 +139,8 @@ last_tile_trigger_timestamp = pygame.time.get_ticks()
 beginning_timestamp = pygame.time.get_ticks()
 intro_started_timestamp = 0
 print_text_started_timestamp = 0
+crazy_frog_started_timestamp = 0
+circle_started_timestamp = 0
 last_change_of_colors_for_CrazyFrog = pygame.time.get_ticks()
 
 # Variables for ChangingColors
@@ -152,6 +153,7 @@ print_text_is_on = False
 circle_is_on = False
 changing_colors_is_on = False
 intro_is_on = False
+crazy_frog_is_on = False
 
 clock = pygame.time.Clock()
 
@@ -178,13 +180,16 @@ while not done:
         game.color_tiles_in_red_and_green(matrix)
         last_change_of_colors_for_CrazyFrog = pygame.time.get_ticks()
         continue
-    else:
-        if(type(game) is CrazyFrog):
-            continue
     # ----
 
     # First 50 sek. Or games going for 10 mins? Start Intro animation
-    if ((current_time - beginning_timestamp) < 58000 or (current_time - intro_started_timestamp) > 658000) and not intro_is_on:
+    if ((current_time - beginning_timestamp) < 58000 or (current_time - intro_started_timestamp) > 658000) and not intro_is_on: #658000
+
+        changing_colors_is_on = False
+        print_text_is_on = False
+        circle_is_on = False
+        crazy_frog_is_on = False
+
         # Print numbers 3 to 1
         game = PrintText()
         game.start_game(matrix)
@@ -249,6 +254,11 @@ while not done:
             last_tile_trigger_timestamp = pygame.time.get_ticks()
             print_text_started_timestamp = pygame.time.get_ticks()
             print_text_is_on = True
+
+
+            # The first animation to turn on
+            circle_is_on = True
+
         continue
  
 
@@ -261,14 +271,53 @@ while not done:
             print_text_is_on = False
             changing_colors_is_on = False
 
-            game = Circle()
-            game.start_game(matrix)
+            if circle_is_on:
+                game = Circle()
+                #circle_started_timestamp = pygame.time.get_ticks()   --- perkeliau sita i kita viena
+            else:
+                if crazy_frog_is_on:
+                    game = CrazyFrog()
+                    #crazy_frog_started_timestamp = pygame.time.get_ticks()
 
+            game.start_game(matrix)
             someone_did_step = read_weights()
         continue
-            
-    # No interaction with the installation for 10 seconds? Turn on PrintText: STEP ON
-    if (current_time - last_tile_trigger_timestamp) > 30000:
+
+    # Circle is on and taking longer than 5mins? Turn on CrazyFrog
+    if circle_is_on and (current_time - circle_started_timestamp) > 300000:
+        changing_colors_is_on = False
+        circle_is_on = False
+        crazy_frog_started_timestamp = pygame.time.get_ticks()
+        game.end_game(matrix)
+
+        # Print 3 to 1
+        game = PrintText()
+        game.start_game(matrix)
+
+        game.paint_letters(matrix, 6)
+        visualiseGrid()
+        pygame.time.delay(1000)
+
+        game.paint_letters(matrix, 5)
+        visualiseGrid()
+        pygame.time.delay(1000)
+
+        game.paint_letters(matrix, 4)
+        visualiseGrid()
+        pygame.time.delay(1000)
+
+        game.paint_letters(matrix, 1)
+
+        last_tile_trigger_timestamp = pygame.time.get_ticks()
+        print_text_started_timestamp = pygame.time.get_ticks()
+        print_text_is_on = True
+
+        crazy_frog_is_on = True
+        continue
+        
+
+    # No interaction with the installation for 20 seconds? Turn on PrintText: STEP ON
+    if (current_time - last_tile_trigger_timestamp) > 20000:
         game.end_game(matrix)
         changing_colors_is_on = False
         last_tile_trigger_timestamp = pygame.time.get_ticks()
@@ -277,17 +326,24 @@ while not done:
         game.start_game(matrix)
         game.paint_letters(matrix, 1)
         print_text_is_on = True
-
         continue
 
-    # PrintText taking longer than 5 sec? Start the ChangingColors
-    if (print_text_is_on and (current_time - print_text_started_timestamp) > 5000):
+    # PrintText taking longer than 5 sec? Start the ChangingColors or CrazyFrog
+    if print_text_is_on and (current_time - print_text_started_timestamp) > 5000:
         game.end_game(matrix)
         print_text_started = 0
         print_text_is_on = False
-        changing_colors_is_on = True
-        game = ChangingColors()
-        game.start_game(matrix)
+
+        if circle_is_on:
+            changing_colors_is_on = True
+            game = ChangingColors()
+            game.start_game(matrix)
+
+        if crazy_frog_is_on:
+            crazy_frog_is_on = True
+            game = CrazyFrog()
+            game.start_game(matrix)
+            continue
 
     # Changing colors is on?
     if changing_colors_is_on:
